@@ -87,5 +87,14 @@ namespace CS321_W5D1_ExerciseLogAPI.Controllers
         }
 
         // TODO: Class Project: Add new Delete route
+        // DELETE /api/activities
+        [Authorize(Roles = "Admin")]
+        [HttpDelete]
+        public IActionResult Delete()
+        {
+            // code to delete all activities goes here...
+
+            return Ok("Deleted all activities");
+        }
     }
 }
