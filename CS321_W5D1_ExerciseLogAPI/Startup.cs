@@ -57,6 +57,7 @@ namespace CS321_W5D1_ExerciseLogAPI
             app.UseHttpsRedirection();
 
             // TODO: Prep Part 1: Use authentication 
+            app.UseAuthentication();
 
             app.UseMvc();
         }
