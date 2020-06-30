@@ -62,7 +62,7 @@ namespace CS321_W5D1_ExerciseLogAPI
 
         // TODO: Class Project: Seed admin user
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -76,10 +76,43 @@ namespace CS321_W5D1_ExerciseLogAPI
 
             app.UseHttpsRedirection();
 
-            // TODO: Prep Part 1: Use authentication 
             app.UseAuthentication();
-
             app.UseMvc();
+
+            // create admin user if it doesn't already exist
+            SeedAdminUser(userManager, roleManager);
+        }
+
+        private void SeedAdminUser(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            // create an Admin role, if it doesn't already exist
+            if (roleManager.FindByNameAsync("Admin").Result == null)
+            {
+                var adminRole = new IdentityRole
+                {
+                    Name = "Admin",
+                    NormalizedName = "Admin".ToUpper()
+                };
+                var result = roleManager.CreateAsync(adminRole).Result;
+            }
+
+            // create an Admin user, if it doesn't already exist
+            if (userManager.FindByNameAsync("admin").Result == null)
+            {
+                User user = new User
+                {
+                    UserName = "admin@test.com",
+                    Email = "admin@test.com"
+                };
+
+                // add the Admin user to the Admin role
+                IdentityResult result = userManager.CreateAsync(user, "AdminPassword123!").Result;
+
+                if (result.Succeeded)
+                {
+                    userManager.AddToRoleAsync(user, "Admin").Wait();
+                }
+            }
         }
 
 
