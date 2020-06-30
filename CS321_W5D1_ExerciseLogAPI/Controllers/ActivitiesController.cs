@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CS321_W5D1_ExerciseLogAPI.ApiModels;
 using CS321_W5D1_ExerciseLogAPI.Core.Services;
@@ -24,6 +25,13 @@ namespace CS321_W5D1_ExerciseLogAPI.Controllers
         }
 
         // TODO: Class Project: Add CurrentUserId property
+        private string CurrentUserId
+        {
+            get
+            {
+                return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            }
+        }
 
         // GET api/activities
         [HttpGet]
