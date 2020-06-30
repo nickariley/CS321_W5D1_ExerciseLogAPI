@@ -35,24 +35,37 @@ namespace CS321_W5D1_ExerciseLogAPI.Controllers
 
         // GET api/activities
         [HttpGet]
-        public IActionResult Get()
-        {
-            // TODO: Class Project: Only return users data, unless Admin
-            var activityModels = _activityService
-                .GetAll()
-                .ToApiModels(); // convert activities to ActivityModels
+         public IActionResult Get()
+         {
+             // if the user is an Admin, return all activities
+             if (User.IsInRole("Admin"))
+             {
+                 var allActivities = _activityService
+                     .GetAll()
+                     .ToApiModels(); 
+                 return Ok(allActivities);
+             }
 
-            return Ok(activityModels);
-        }
+             // otherwise return only the user's activities
+             var activityModels = _activityService
+                 .GetAllForUser(CurrentUserId)
+                 .ToApiModels(); 
+             return Ok(activityModels);
+         }
 
         // get specific activity by id
         // GET api/activities/:id
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            // TODO: Class Project: Only return users data, unless Admin
             var activity = _activityService.Get(id);
             if (activity == null) return NotFound();
+            // if the activity does not belong to the current user and the current user is not an admin
+            if (activity.UserId != CurrentUserId && !User.IsInRole("Admin"))
+            {
+                ModelState.AddModelError("UserId", "You can only retrieve your own activities.");
+                return BadRequest(ModelState);
+            }
             return Ok(activity.ToApiModel());
         }
 
